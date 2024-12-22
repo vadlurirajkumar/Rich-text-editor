@@ -1,95 +1,41 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"; // Ensures client-side rendering for the page
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+
+// Dynamically import components that use browser-specific APIs, ensuring they are only rendered on the client
+const RichTextEditor = dynamic(() => import("@/app/compnents/RichText"), { ssr: false });
+
+const Home: React.FC = () => {
+  const [isClient, setIsClient] = useState(false);
+  const [editorValue, setEditorValue] = useState<string>('');
+
+  const handleEditorChange = (value: string) => {
+    setEditorValue(value);
+  };
+  // Ensure the code runs only on the client
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Render the component only after the client is ready
+  if (!isClient) {
+    return null; // Return null during SSR (before the page is fully loaded on the client)
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+    <>
+      <div className='w-50 mx-auto my-5'>
+        <RichTextEditor
+          value={editorValue}
+          onChange={handleEditorChange}
+          className="custom-editor"
+          style={{ marginBottom: '20px' }}
         />
+        <p className='bg-danger text-white'>{editorValue}</p>
       </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+    </>
+  )
 }
+
+export default Home
